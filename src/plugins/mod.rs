@@ -6,6 +6,10 @@ mod line_num;
 const HIGHEST_ORDER:u32 = 0;
 const LOWEST_ORDER:u32 = 1000;
 
+pub struct Context {
+
+}
+
 pub trait TextFilter{
     fn name(&self) -> &'static str;
 
@@ -16,5 +20,5 @@ pub trait TextFilter{
 
     /// handle input, output
     /// @return
-    fn filter(&mut self, input: String) -> Option<String>;
+    fn filter(&mut self, ctx: &mut Context, input: String) -> Option<String>;
 }

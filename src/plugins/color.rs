@@ -1,5 +1,5 @@
-use crate::plugins::{LOWEST_ORDER, TextFilter};
-
+use crate::plugins::{Context, LOWEST_ORDER, TextFilter};
+use owo_colors::OwoColorize;
 /*
 使用方式
 
@@ -31,7 +31,13 @@ printf("\e[32m%s\e[0m\n", "hello world");
  */
 
 pub struct Color {
+    parsers: Vec<Box<dyn ParseLog>>,
+}
 
+impl Color {
+    pub fn new() -> Self {
+        Self { parsers: vec![] }
+    }
 }
 
 impl TextFilter for Color {
@@ -44,10 +50,67 @@ impl TextFilter for Color {
     }
 
     fn init(&mut self, _config: &str) -> std::io::Result<()> {
-        todo!()
+        self.parsers.push(Box::new(IotLoggerParserV1::new()));
+        Ok(())
     }
 
-    fn filter(&mut self, input: String) -> Option<String> {
-        todo!()
+    fn filter(&mut self, _ctx: &mut Context, input: String) -> Option<String> {
+        for p in self.parsers.iter_mut() {
+            match p.parse(input.as_str()) {
+                LogLevel::Unknown => continue,
+                LogLevel::Debug => {
+                    return Some(input);
+                }
+                LogLevel::Info => {
+                    return Some(format!("{}", input.yellow()));
+                    // return Some(format!("{}", input.fg_rgb::<255,215,0>()));
+                }
+                LogLevel::Warn => {
+                    return Some(format!("{}", input.red()));
+                    // return Some(format!("{}", input.fg_rgb::<255, 69, 0>()));
+                }
+                LogLevel::Error => {
+                    return Some(format!("{}", input.bright_red()));
+                    // return Some(format!("{}", input.fg_rgb::<255, 0, 0>()));
+                }
+            }
+        }
+        Some(input)
+    }
+}
+
+enum LogLevel {
+    Unknown,
+    Debug,
+    Info,
+    Warn,
+    Error
+}
+
+trait ParseLog {
+    fn parse(&mut self, txt:&str) -> LogLevel;
+}
+
+struct IotLoggerParserV1 {}
+
+impl IotLoggerParserV1 {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
+impl ParseLog for IotLoggerParserV1 {
+    fn parse(&mut self, txt: &str) -> LogLevel {
+        if txt.len() < 3 {
+            return LogLevel::Unknown;
+        }
+        let prefix= &txt[..3];
+        match prefix {
+            "[I]" => LogLevel::Info,
+            "[D]" => LogLevel::Debug,
+            "[W]" => LogLevel::Warn,
+            "[E]" => LogLevel::Error,
+            _ => LogLevel::Unknown,
+        }
     }
 }

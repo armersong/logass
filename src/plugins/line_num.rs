@@ -1,4 +1,4 @@
-use crate::plugins::{LOWEST_ORDER, TextFilter};
+use crate::plugins::{Context, LOWEST_ORDER, TextFilter};
 
 pub struct LineNum {
     seq: u64,
@@ -20,10 +20,10 @@ impl TextFilter for LineNum {
     }
 
     fn init(&mut self, _config: &str) -> std::io::Result<()> {
-        todo!()
+        Ok(())
     }
 
-    fn filter(&mut self, input: String) -> Option<String> {
+    fn filter(&mut self, _ctx: &mut Context, input: String) -> Option<String> {
         self.seq += 1;
         Some(format!("{:6}: {}", self.seq, input))
     }

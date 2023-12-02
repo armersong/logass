@@ -6,11 +6,11 @@ version = 3
 name = "logass"
 version = "0.1.0"
 dependencies = [
- "terminal_color_builder",
+ "owo-colors",
 ]
 
 [[package]]
-name = "terminal_color_builder"
-version = "0.1.1"
+name = "owo-colors"
+version = "3.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51bc10d4f2e7a2580c9fbeb550ef748c81430cfaffb046f047204bb5a75dbff0"
+checksum = "c1b04fb49957986fdce4d6ee7a65027d55d4b6d2265e5848bbb507b58ccfdb6f"
