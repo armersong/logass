@@ -1,8 +1,8 @@
-use std::fs::File;
-use std::io::{Result, Read};
 use crate::plugins::color::Color;
-use crate::plugins::{Context, TextFilter};
 use crate::plugins::ignore::Ignore;
+use crate::plugins::{Context, TextFilter};
+use std::fs::File;
+use std::io::{Read, Result};
 
 pub struct Processor {
     plugins: Vec<Box<dyn TextFilter>>,
@@ -21,11 +21,14 @@ impl Processor {
         let mut color: Box<dyn TextFilter> = Box::new(Color::new());
         Self::init_plugin(plugin_config_path, &mut color)?;
         self.plugins.push(color);
+
+        self.plugins.sort_by(|a, b| a.order().cmp(&b.order()));
         Ok(())
     }
 
-    fn init_plugin(plugin_config_path: &str, plugin:&mut Box<dyn TextFilter>) -> Result<()> {
-        let config = Self::read_config(format!("{}/{}.json", plugin_config_path, plugin.name()).as_str())?;
+    fn init_plugin(plugin_config_path: &str, plugin: &mut Box<dyn TextFilter>) -> Result<()> {
+        let config =
+            Self::read_config(format!("{}/{}.json", plugin_config_path, plugin.name()).as_str())?;
         println!("init plugin {}", plugin.name());
         plugin.init(config.as_str())?;
         Ok(())

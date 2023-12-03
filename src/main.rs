@@ -22,6 +22,7 @@ fn main() -> std::io::Result<()> {
     let mut output = output::Output::new();
     let mut proc = plugins::processor::Processor::new();
     proc.init("plugins")?;
+    println!("\n\n\n========================================\n\n");
     loop {
         if let Some(data) = input.read_line() {
             if let Some(out_data) = proc.handle(data) {

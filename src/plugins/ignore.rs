@@ -1,6 +1,6 @@
+use crate::plugins::model::IgnoreConfig;
 use crate::plugins::{Context, TextFilter, HIGHEST_ORDER};
 use regex::Regex;
-use crate::plugins::model::IgnoreConfig;
 
 pub struct Ignore {
     rules: Vec<Regex>,
