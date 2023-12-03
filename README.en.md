@@ -23,6 +23,6 @@ For example: color (color filtering) plug-in, the configuration file name is: co
 4.  Create Pull Request
 
 
-#### Gitee Feature
+#### Feature
 - Plug-in system: can realize row-based filtering, rendering, analysis, statistics, etc.
 - Plug-in parameters are configurable
