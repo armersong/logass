@@ -1,6 +1,7 @@
 use crate::plugins::model::IgnoreConfig;
 use crate::plugins::{Context, TextFilter, HIGHEST_ORDER};
 use regex::Regex;
+use crate::log::log;
 
 pub struct Ignore {
     rules: Vec<Regex>,
@@ -30,7 +31,7 @@ impl TextFilter for Ignore {
             match Regex::new(r.as_str()) {
                 Ok(r) => self.rules.push(r),
                 Err(e) => {
-                    println!("rule [{}] invalid [{}]", r, e.to_string());
+                    log(format!("rule [{}] invalid [{}]", r, e));
                 }
             }
         }

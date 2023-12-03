@@ -3,16 +3,18 @@
 use crate::readers::filesource::FileSource;
 use crate::readers::TextReader;
 use std::time::Duration;
+use crate::log::{log};
 
 mod output;
 mod plugins;
 mod readers;
+pub mod log;
 
 fn main() -> std::io::Result<()> {
     let version = env!("CARGO_PKG_VERSION");
     let args: Vec<String> = std::env::args().collect();
     let prog_name = args[0].as_str();
-    println!("{} version: {}", prog_name, version);
+    log(format!("{} version: {}", prog_name, version));
     let mut input = if args.len() > 1 {
         Box::new(FileSource::new(args[1].as_str())?)
     } else {
@@ -22,7 +24,7 @@ fn main() -> std::io::Result<()> {
     let mut output = output::Output::new();
     let mut proc = plugins::processor::Processor::new();
     proc.init("plugins")?;
-    println!("\n\n\n========================================\n\n");
+    log(format!("\n\n\n========================================\n\n"));
     loop {
         if let Some(data) = input.read_line() {
             if let Some(out_data) = proc.handle(data) {

@@ -3,6 +3,7 @@ use crate::plugins::ignore::Ignore;
 use crate::plugins::{Context, TextFilter};
 use std::fs::File;
 use std::io::{Read, Result};
+use crate::log::log;
 
 pub struct Processor {
     plugins: Vec<Box<dyn TextFilter>>,
@@ -29,7 +30,7 @@ impl Processor {
     fn init_plugin(plugin_config_path: &str, plugin: &mut Box<dyn TextFilter>) -> Result<()> {
         let config =
             Self::read_config(format!("{}/{}.json", plugin_config_path, plugin.name()).as_str())?;
-        println!("init plugin {}", plugin.name());
+        log(format!("init plugin {}", plugin.name()));
         plugin.init(config.as_str())?;
         Ok(())
     }

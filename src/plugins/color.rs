@@ -3,6 +3,7 @@ use crate::plugins::{Context, TextFilter, LOWEST_ORDER};
 use owo_colors::OwoColorize;
 use regex::Regex;
 use std::io::Result;
+use crate::log::log;
 /*
 使用方式
 
@@ -169,7 +170,7 @@ impl IotLoggerDynParserV1 {
             match IotLogRule::new(r.clone()) {
                 Ok(r) => rs.push(r),
                 Err(e) => {
-                    println!("rule [{:?}] invalid [{}]", r, e);
+                    log(format!("rule [{:?}] invalid [{}]", r, e));
                 }
             }
         }
