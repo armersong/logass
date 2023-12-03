@@ -50,7 +50,7 @@ impl TextFilter for Color {
     }
 
     fn order(&self) -> u32 {
-        LOWEST_ORDER - 1
+        LOWEST_ORDER - 100
     }
 
     fn init(&mut self, config: &str) -> std::io::Result<()> {

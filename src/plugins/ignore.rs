@@ -19,7 +19,7 @@ impl TextFilter for Ignore {
     }
 
     fn order(&self) -> u32 {
-        HIGHEST_ORDER
+        HIGHEST_ORDER + 100
     }
 
     fn init(&mut self, config: &str) -> std::io::Result<()> {
