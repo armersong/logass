@@ -1,15 +1,15 @@
+use crate::readers::TextReader;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::thread::sleep;
 use std::time::Duration;
-use crate::readers::TextReader;
 
 pub struct FileSource {
     reader: BufReader<File>,
 }
 
 impl FileSource {
-    pub fn new(filename:&str) -> std::io::Result<Self> {
+    pub fn new(filename: &str) -> std::io::Result<Self> {
         Ok(Self {
             reader: BufReader::new(File::open(filename)?),
         })
@@ -21,14 +21,14 @@ impl TextReader for FileSource {
         let mut s = String::new();
         match self.reader.read_line(&mut s) {
             Ok(size) => {
-                if size >0 {
+                if size > 0 {
                     return Some(s);
                 } else {
                     sleep(Duration::from_secs(1));
                 }
             }
             Err(e) => {
-                println!("reader failed: {}",e);
+                println!("reader failed: {}", e);
             }
         }
         None

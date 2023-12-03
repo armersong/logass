@@ -1,5 +1,8 @@
+use std::fs::File;
+use std::io::{Result, Read};
 use crate::plugins::color::Color;
 use crate::plugins::{Context, TextFilter};
+use crate::plugins::ignore::Ignore;
 
 pub struct Processor {
     plugins: Vec<Box<dyn TextFilter>>,
@@ -10,15 +13,33 @@ impl Processor {
         Self { plugins: vec![] }
     }
 
-    pub fn init(&mut self, _plugin_config_path: &str) -> std::io::Result<()> {
-        let mut p: Box<dyn TextFilter> = Box::new(Color::new());
-        p.init("")?;
-        self.plugins.push(p);
+    pub fn init(&mut self, plugin_config_path: &str) -> std::io::Result<()> {
+        let mut ignore: Box<dyn TextFilter> = Box::new(Ignore::new());
+        Self::init_plugin(plugin_config_path, &mut ignore)?;
+        self.plugins.push(ignore);
+
+        let mut color: Box<dyn TextFilter> = Box::new(Color::new());
+        Self::init_plugin(plugin_config_path, &mut color)?;
+        self.plugins.push(color);
         Ok(())
     }
 
+    fn init_plugin(plugin_config_path: &str, plugin:&mut Box<dyn TextFilter>) -> Result<()> {
+        let config = Self::read_config(format!("{}/{}.json", plugin_config_path, plugin.name()).as_str())?;
+        println!("init plugin {}", plugin.name());
+        plugin.init(config.as_str())?;
+        Ok(())
+    }
+
+    fn read_config(filename: &str) -> Result<String> {
+        let mut file = File::open(filename)?;
+        let mut config = String::new();
+        file.read_to_string(&mut config)?;
+        Ok(config)
+    }
+
     pub fn handle(&mut self, text: String) -> Option<String> {
-        let mut ctx = Context{};
+        let mut ctx = Context {};
         let mut txt = Some(text);
         for p in self.plugins.iter_mut() {
             if let Some(t) = txt.take() {
@@ -26,7 +47,7 @@ impl Processor {
                     txt = Some(t1);
                 }
             } else {
-                break;
+                return None;
             }
         }
         txt

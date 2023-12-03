@@ -1,4 +1,4 @@
-use crate::plugins::{Context, LOWEST_ORDER, TextFilter};
+use crate::plugins::{Context, TextFilter, LOWEST_ORDER};
 
 pub struct LineNum {
     seq: u64,
@@ -6,7 +6,7 @@ pub struct LineNum {
 
 impl LineNum {
     pub fn new() -> Self {
-        Self{ seq: 0 }
+        Self { seq: 0 }
     }
 }
 

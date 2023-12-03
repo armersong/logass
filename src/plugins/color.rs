@@ -1,5 +1,8 @@
-use crate::plugins::{Context, LOWEST_ORDER, TextFilter};
+use crate::plugins::model::{ColorConfig, ColorLogConfig};
+use crate::plugins::{Context, TextFilter, LOWEST_ORDER};
 use owo_colors::OwoColorize;
+use regex::Regex;
+use std::io::Result;
 /*
 使用方式
 
@@ -46,11 +49,16 @@ impl TextFilter for Color {
     }
 
     fn order(&self) -> u32 {
-        LOWEST_ORDER -1
+        LOWEST_ORDER - 1
     }
 
-    fn init(&mut self, _config: &str) -> std::io::Result<()> {
-        self.parsers.push(Box::new(IotLoggerParserV1::new()));
+    fn init(&mut self, config: &str) -> std::io::Result<()> {
+        let cfg: ColorConfig =
+            serde_json::from_str(config).map_err(|e| std::io::Error::other(e.to_string()))?;
+        self.parsers.push(IotLoggerDynParserV1::new(cfg.log));
+        if self.parsers.is_empty() {
+            self.parsers.push(Box::new(IotLoggerParserV1::new()));
+        }
         Ok(())
     }
 
@@ -73,22 +81,40 @@ impl TextFilter for Color {
                     return Some(format!("{}", input.bright_red()));
                     // return Some(format!("{}", input.fg_rgb::<255, 0, 0>()));
                 }
+                LogLevel::Pass => {
+                    return Some(format!("{}", input.bright_green()));
+                }
             }
         }
         Some(input)
     }
 }
 
+#[derive(Debug, Clone)]
 enum LogLevel {
     Unknown,
     Debug,
     Info,
     Warn,
-    Error
+    Error,
+    Pass,
+}
+
+impl From<&str> for LogLevel {
+    fn from(value: &str) -> Self {
+        match value {
+            "D" => LogLevel::Debug,
+            "I" => LogLevel::Info,
+            "W" => LogLevel::Warn,
+            "E" => LogLevel::Error,
+            "P" => LogLevel::Pass,
+            _ => LogLevel::Unknown,
+        }
+    }
 }
 
 trait ParseLog {
-    fn parse(&mut self, txt:&str) -> LogLevel;
+    fn parse(&mut self, txt: &str) -> LogLevel;
 }
 
 struct IotLoggerParserV1 {}
@@ -104,13 +130,60 @@ impl ParseLog for IotLoggerParserV1 {
         if txt.len() < 3 {
             return LogLevel::Unknown;
         }
-        let prefix= &txt[..3];
+        let prefix = &txt[..3];
         match prefix {
             "[I]" => LogLevel::Info,
             "[D]" => LogLevel::Debug,
             "[W]" => LogLevel::Warn,
             "[E]" => LogLevel::Error,
+            "[P]" => LogLevel::Pass,
             _ => LogLevel::Unknown,
         }
+    }
+}
+
+struct IotLogRule {
+    reg: Regex,
+    level: LogLevel,
+}
+
+impl IotLogRule {
+    pub fn new(cfg: ColorLogConfig) -> Result<Self> {
+        let reg =
+            Regex::new(cfg.match_.as_str()).map_err(|e| std::io::Error::other(e.to_string()))?;
+        Ok(Self {
+            reg,
+            level: LogLevel::from(cfg.level.as_str()),
+        })
+    }
+}
+
+struct IotLoggerDynParserV1 {
+    log_rules: Vec<IotLogRule>,
+}
+
+impl IotLoggerDynParserV1 {
+    pub fn new(rules: Vec<ColorLogConfig>) -> Box<Self> {
+        let mut rs = Vec::new();
+        for r in rules {
+            match IotLogRule::new(r.clone()) {
+                Ok(r) => rs.push(r),
+                Err(e) => {
+                    println!("rule [{:?}] invalid [{}]", r, e);
+                }
+            }
+        }
+        Box::new(Self { log_rules: rs })
+    }
+}
+
+impl ParseLog for IotLoggerDynParserV1 {
+    fn parse(&mut self, txt: &str) -> LogLevel {
+        for rule in self.log_rules.iter() {
+            if rule.reg.is_match(txt) {
+                return rule.level.clone();
+            }
+        }
+        LogLevel::Unknown
     }
 }

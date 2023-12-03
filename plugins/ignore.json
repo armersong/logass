@@ -1,0 +1,14 @@
+{
+  "rules": [
+    "\\[ ",
+    "^\\+",
+    "\"@",
+    "^\n",
+    "^OK",
+    "^ERROR",
+    "^atLib",
+    "already allocate buffer",
+    "input port state error",
+    "TUYA D\\]"
+    ]
+}

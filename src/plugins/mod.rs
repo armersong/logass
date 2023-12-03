@@ -1,22 +1,21 @@
-mod ignore;
 mod color;
-pub mod processor;
+mod ignore;
 mod line_num;
+mod model;
+pub mod processor;
 
-const HIGHEST_ORDER:u32 = 0;
-const LOWEST_ORDER:u32 = 1000;
+const HIGHEST_ORDER: u32 = 0;
+const LOWEST_ORDER: u32 = 1000;
 
-pub struct Context {
+pub struct Context {}
 
-}
-
-pub trait TextFilter{
+pub trait TextFilter {
     fn name(&self) -> &'static str;
 
     /// lower is higher
     fn order(&self) -> u32;
 
-    fn init(&mut self, config:&str) -> std::io::Result<()>;
+    fn init(&mut self, config: &str) -> std::io::Result<()>;
 
     /// handle input, output
     /// @return

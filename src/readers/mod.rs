@@ -1,7 +1,7 @@
 use crate::readers::stdinput::StdInput;
 
-pub mod stdinput;
 pub mod filesource;
+pub mod stdinput;
 
 pub trait TextReader {
     fn read_line(&mut self) -> Option<String>;

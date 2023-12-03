@@ -1,8 +1,6 @@
 use crate::readers::TextReader;
 
-pub struct StdInput {
-
-}
+pub struct StdInput {}
 
 impl StdInput {
     pub fn new() -> Self {

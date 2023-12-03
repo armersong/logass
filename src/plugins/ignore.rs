@@ -1,7 +1,15 @@
-use crate::plugins::{Context, HIGHEST_ORDER, TextFilter};
+use crate::plugins::{Context, TextFilter, HIGHEST_ORDER};
+use regex::Regex;
+use crate::plugins::model::IgnoreConfig;
 
 pub struct Ignore {
+    rules: Vec<Regex>,
+}
 
+impl Ignore {
+    pub fn new() -> Self {
+        Self { rules: vec![] }
+    }
 }
 
 impl TextFilter for Ignore {
@@ -13,11 +21,28 @@ impl TextFilter for Ignore {
         HIGHEST_ORDER
     }
 
-    fn init(&mut self, _config: &str) -> std::io::Result<()> {
+    fn init(&mut self, config: &str) -> std::io::Result<()> {
+        let mut cfg: IgnoreConfig =
+            serde_json::from_str(config).map_err(|e| std::io::Error::other(e.to_string()))?;
+        // ASC, speed up
+        cfg.rules.sort();
+        for r in cfg.rules.iter() {
+            match Regex::new(r.as_str()) {
+                Ok(r) => self.rules.push(r),
+                Err(e) => {
+                    println!("rule [{}] invalid [{}]", r, e.to_string());
+                }
+            }
+        }
         Ok(())
     }
 
     fn filter(&mut self, _ctx: &mut Context, input: String) -> Option<String> {
+        for rule in self.rules.iter() {
+            if rule.is_match(input.as_str()) {
+                return None;
+            }
+        }
         Some(input)
     }
 }
