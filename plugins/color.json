@@ -1,23 +1,23 @@
 {
   "log": [
     {
-      "match": "^\\[D\\]",
+      "match": "^\\s*\\[D\\]",
       "level": "D"
     },
     {
-      "match": "^\\[I\\]",
+      "match": "^\\s*\\[I\\]",
       "level": "I"
     },
     {
-      "match": "^\\[W\\]",
+      "match": "^\\s*\\[W\\]",
       "level": "W"
     },
     {
-      "match": "^\\[E\\]",
+      "match": "^\\s*\\[E\\]",
       "level": "E"
     },
     {
-      "match": "^\\[P\\]",
+      "match": "^\\s*\\[P\\]",
       "level": "P"
     }
   ]

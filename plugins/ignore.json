@@ -9,6 +9,8 @@
     "^atLib",
     "already allocate buffer",
     "input port state error",
-    "TUYA D\\]"
+    "TUYA D\\]",
+    "<vpe_node_qbuf",
+    "<thread_qbuf"
     ]
 }
