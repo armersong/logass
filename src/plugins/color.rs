@@ -1,9 +1,9 @@
+use crate::log::log;
 use crate::plugins::model::{ColorConfig, ColorLogConfig};
 use crate::plugins::{Context, TextFilter, LOWEST_ORDER};
 use owo_colors::OwoColorize;
 use regex::Regex;
 use std::io::Result;
-use crate::log::log;
 /*
 使用方式
 
@@ -54,8 +54,8 @@ impl TextFilter for Color {
     }
 
     fn init(&mut self, config: &str) -> std::io::Result<()> {
-        let cfg: ColorConfig =
-            serde_json::from_str(config).map_err(|e| std::io::Error::other(e.to_string()))?;
+        let cfg: ColorConfig = serde_json::from_str(config)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
         self.parsers.push(IotLoggerDynParserV1::new(cfg.log));
         if self.parsers.is_empty() {
             self.parsers.push(Box::new(IotLoggerParserV1::new()));
@@ -150,8 +150,8 @@ struct IotLogRule {
 
 impl IotLogRule {
     pub fn new(cfg: ColorLogConfig) -> Result<Self> {
-        let reg =
-            Regex::new(cfg.match_.as_str()).map_err(|e| std::io::Error::other(e.to_string()))?;
+        let reg = Regex::new(cfg.match_.as_str())
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
         Ok(Self {
             reg,
             level: LogLevel::from(cfg.level.as_str()),

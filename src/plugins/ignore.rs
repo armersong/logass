@@ -1,7 +1,7 @@
+use crate::log::log;
 use crate::plugins::model::IgnoreConfig;
 use crate::plugins::{Context, TextFilter, HIGHEST_ORDER};
 use regex::Regex;
-use crate::log::log;
 
 pub struct Ignore {
     rules: Vec<Regex>,
@@ -23,8 +23,8 @@ impl TextFilter for Ignore {
     }
 
     fn init(&mut self, config: &str) -> std::io::Result<()> {
-        let mut cfg: IgnoreConfig =
-            serde_json::from_str(config).map_err(|e| std::io::Error::other(e.to_string()))?;
+        let mut cfg: IgnoreConfig = serde_json::from_str(config)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
         // ASC, speed up
         cfg.rules.sort();
         for r in cfg.rules.iter() {

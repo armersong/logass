@@ -1,9 +1,9 @@
+use crate::log::log;
 use crate::readers::TextReader;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::thread::sleep;
 use std::time::Duration;
-use crate::log::log;
 
 pub struct FileSource {
     reader: BufReader<File>,

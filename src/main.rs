@@ -1,14 +1,14 @@
 #![allow(dead_code)]
 
+use crate::log::log;
 use crate::readers::filesource::FileSource;
 use crate::readers::TextReader;
 use std::time::Duration;
-use crate::log::{log};
 
+pub mod log;
 mod output;
 mod plugins;
 mod readers;
-pub mod log;
 
 fn main() -> std::io::Result<()> {
     let version = env!("CARGO_PKG_VERSION");
@@ -24,7 +24,9 @@ fn main() -> std::io::Result<()> {
     let mut output = output::Output::new();
     let mut proc = plugins::processor::Processor::new();
     proc.init("plugins")?;
-    log(format!("\n\n\n========================================\n\n"));
+    log(format!(
+        "\n\n\n========================================\n\n"
+    ));
     loop {
         if let Some(data) = input.read_line() {
             if let Some(out_data) = proc.handle(data) {

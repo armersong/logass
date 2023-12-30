@@ -1,9 +1,9 @@
+use crate::log::log;
 use crate::plugins::color::Color;
 use crate::plugins::ignore::Ignore;
 use crate::plugins::{Context, TextFilter};
 use std::fs::File;
 use std::io::{Read, Result};
-use crate::log::log;
 
 pub struct Processor {
     plugins: Vec<Box<dyn TextFilter>>,
