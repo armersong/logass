@@ -3,12 +3,29 @@
 use crate::log::log;
 use crate::readers::filesource::FileSource;
 use crate::readers::TextReader;
+use std::env;
+use std::ffi::OsStr;
+use std::path::Path;
 use std::time::Duration;
 
 pub mod log;
 mod output;
 mod plugins;
 mod readers;
+
+fn get_plugin_dir(name: &str) -> String {
+    let plugin_dir = Path::new(name);
+    if plugin_dir.is_dir() {
+        plugin_dir.to_str().unwrap().to_string()
+    } else {
+        let exe_path = env::current_exe().expect("get exe path failed");
+        let mut exe_path: Vec<&OsStr> = exe_path.iter().collect();
+        exe_path.remove(exe_path.len() - 1);
+        exe_path.push(OsStr::new(name));
+        let plugin_path = exe_path.join(OsStr::new(std::path::MAIN_SEPARATOR_STR));
+        plugin_path.to_str().unwrap().to_string()
+    }
+}
 
 fn main() -> std::io::Result<()> {
     let version = env!("CARGO_PKG_VERSION");
@@ -23,7 +40,8 @@ fn main() -> std::io::Result<()> {
     };
     let mut output = output::Output::new();
     let mut proc = plugins::processor::Processor::new();
-    proc.init("plugins")?;
+    let plugin_dir = get_plugin_dir("plugins");
+    proc.init(plugin_dir.as_str())?;
     log(format!(
         "\n\n\n========================================\n\n"
     ));

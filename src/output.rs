@@ -1,5 +1,5 @@
+use std::io::Write;
 use termcolor::{ColorChoice, StandardStream};
-use std::io::{Write};
 
 pub struct Output {
     out: StandardStream,
@@ -12,6 +12,6 @@ impl Output {
     }
 
     pub fn output(&mut self, txt: String) {
-        let _= self.out.write(txt.as_bytes());
+        let _ = self.out.write(txt.as_bytes());
     }
 }
